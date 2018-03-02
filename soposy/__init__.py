@@ -158,8 +158,8 @@ def parse_arguments(argv=None):
         type=argparse.FileType(),
         metavar='FILE',
         required=not os.path.isfile(DEFAULT_CONFIG_FILE),
-        default=open(os.path.isfile(DEFAULT_CONFIG_FILE))
-                if os.path.isfile(os.path.isfile(DEFAULT_CONFIG_FILE))
+        default=open(DEFAULT_CONFIG_FILE)
+                if os.path.isfile(DEFAULT_CONFIG_FILE)
                 else None,
         help='Use the specified configuration file instead of the default.')
     parser.add_argument(
