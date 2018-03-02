@@ -63,7 +63,7 @@ class FivehundredPx(Connector):
     _URL_ACCESS_TOKEN = _URL_API + "oauth/access_token"
     _URL_PHOTOS = _URL_API + "photos"
 
-    logger = logging.getLogger(f'soposy.connectors.500px')
+    logger = logging.getLogger('soposy.connectors.500px')
 
     def configure(self, name, section):
         Connector.configure(self, name, section)
@@ -123,7 +123,7 @@ class FivehundredPx(Connector):
             reply = requests.post(
                 cls._URL_REQUEST_TOKEN,
                 data={'oauth_callback':
-                      f'http://localhost:{server.server_port}'},
+                      'http://localhost:{}'.format(server.server_port)},
                 auth=OAuth1(cls._CONSUMER_KEY,
                             client_secret=cls._CONSUMER_SECRET))
             cls.logger.debug('API reply: %s: %s', reply, reply.text)
@@ -138,7 +138,7 @@ class FivehundredPx(Connector):
 
             # request user authorization
             cls.logger.debug('Requesting user authorization')
-            url = f'{cls._URL_AUTHORIZE}?oauth_token={token}'
+            url = '{}?oauth_token={}'.format(cls._URL_AUTHORIZE, token)
             subprocess.check_call(['xdg-open', url])
 
             if not got_data_event.wait(120):
@@ -164,10 +164,11 @@ class FivehundredPx(Connector):
         token = parsed['oauth_token'][0]
         token_secret = parsed['oauth_token_secret'][0]
 
-        print(f'''Use the following for your config:
+        print('''Use the following for your config:
 
   token = {token}
-  token_secret = {token_secret}''')
+  token_secret = {token_secret}'''.format(token=token,
+                                          token_secret=token_secret))
 
     def _session(self):
         return OAuth1Session(self._CONSUMER_KEY,
@@ -221,7 +222,7 @@ class Twitter(Connector):
     _CONSUMER_KEY = 'iF297JTU1bBTZx2jo8XkYBSzd'
     _CONSUMER_SECRET = '9mfE136ApHGUWpyPlMXJYAxBveTRN0pSebgOmwkt9ZXYXdOrp5'
 
-    logger = logging.getLogger(f'soposy.connectors.twitter')
+    logger = logging.getLogger('soposy.connectors.twitter')
 
     def configure(self, name, section):
         Connector.configure(self, name, section)
@@ -250,10 +251,11 @@ class Twitter(Connector):
         verifier = input('Enter generated verifier here and press enter: ')
         token = auth.get_access_token(verifier)
 
-        print(f'''Use the following for your config:
+        print('''Use the following for your config:
 
-  token = {token[0]}
-  token_secret = {token[1]}''')
+  token = {token}
+  token_secret = {token_secret}'''.format(token=token[0],
+                                          token_secret=token[1]))
 
     def entries(self, after):
         raise NotImplementedError()
@@ -276,7 +278,7 @@ class Pinterest(Connector):
     _CONSUMER_SECRET = '8ec9c977b401734355728670d9a89e9b64ed43906' \
                        'ff9e4e35d36889ae7148c60'
 
-    logger = logging.getLogger(f'soposy.connectors.pinterest')
+    logger = logging.getLogger('soposy.connectors.pinterest')
 
     def configure(self, name, section):
         Connector.configure(self, name, section)
@@ -308,7 +310,7 @@ class Pinterest(Connector):
             redirect_uri='https://localhost')
         authorization_url, state = oauth.authorization_url(
             'https://api.pinterest.com/oauth/')
-        print(f'Please go to {authorization_url} and authorize access.')
+        print('Please go to {} and authorize access.'.format(authorization_url))
         authorization_response = input(
             'Paste the full redirect localhost URL and press enter: ')
         token = oauth.fetch_token(
@@ -316,9 +318,9 @@ class Pinterest(Connector):
             authorization_response=authorization_response,
             client_secret=cls._CONSUMER_SECRET)
 
-        print(f'''Use the following for your config:
+        print('''Use the following for your config:
 
-  token = {token}''')
+  token = {token}'''.format(token=token))
 
     def entries(self, after):
         raise NotImplementedError()
@@ -343,7 +345,7 @@ class Facebook(Connector):
 
     _ACCESS_TOKEN = '176692323109563|dc84928efe8874c7f00e5b1e08cf753b'
 
-    logger = logging.getLogger(f'soposy.connectors.facebook')
+    logger = logging.getLogger('soposy.connectors.facebook')
 
     def configure(self, name, section):
         Connector.configure(self, name, section)
@@ -374,8 +376,8 @@ class Facebook(Connector):
         reply.raise_for_status()
         request_data = reply.json()
 
-        print(f"Open {request_data['verification_uri']} and "
-              f"insert {request_data['user_code']}")
+        print("Open {} and insert {}".format(request_data['verification_uri'],
+                                             request_data['user_code']))
 
         # poll for user reply
         wait_end = time.time() + request_data['expires_in']
@@ -389,9 +391,9 @@ class Facebook(Connector):
             wait_data = reply.json()
 
             if 'access_token' in wait_data:
-                print(f'''Use the following for your config:
+                print('''Use the following for your config:
 
-  token = {wait_data["access_token"]}''')
+  token = {}'''.format(wait_data["access_token"]))
                 break
             elif 'error' in wait_data:
                 subcode = wait_data['error']['error_subcode']
@@ -404,7 +406,7 @@ class Facebook(Connector):
                     print('Request expired')
                     break
                 else:
-                    print(f'Unknown code {subcode}')
+                    print('Unknown code {}'.format(subcode))
 
     def entries(self, after):
         raise NotImplementedError()

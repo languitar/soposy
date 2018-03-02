@@ -97,7 +97,8 @@ def action_sync(args, config, conn):
                     (workflow.name, workflow.source.name)).fetchone()[0]
                 if rows < 1:
                     raise RuntimeError(
-                        f'Source "{workflow.source.name}" lacks initial sync')
+                        'Source {} lacks initial sync'.format(
+                            workflow.source.name))
 
         # iterate all workflows
         now = datetime.datetime.now(pytz.utc)
@@ -119,7 +120,7 @@ def action_sync(args, config, conn):
             else:
                 last_sync = max_horizon
             horizon = max(max_horizon, last_sync)
-            print(f"  Syncing up to {horizon}")
+            print("  Syncing up to {}".format(horizon))
 
             targets = [t.create() for t in workflow.targets]
 
@@ -134,8 +135,8 @@ def action_sync(args, config, conn):
                     (workflow.name, source.name,
                      str(entry.uniqueId))).fetchone()[0]
                 if res > 0:
-                    print(
-                        f"  Skipping already processed entry {entry.uniqueId}")
+                    print("  Skipping already processed entry {}".format(
+                        entry.uniqueId))
                     continue
 
                 # push new entry to all targets

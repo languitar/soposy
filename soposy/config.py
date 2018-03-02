@@ -35,13 +35,15 @@ class ConfigurationError(RuntimeError):
 
 def parse_connector(section, name):
     if 'class' not in section:
-        raise ConfigurationError(f'Section "{section}" lacks a "class".')
+        raise ConfigurationError(
+            'Section "{}" lacks a "class".'.format(section))
     clazz = section['class']
     try:
         parts = clazz.rsplit('.', 1)
         klass = getattr(importlib.import_module(parts[0]), parts[1])
     except KeyError:
-        raise ConfigurationError(f'There is no connector class "{clazz}"')
+        raise ConfigurationError(
+            'There is no connector class "{}"'.format(clazz))
 
     return ConfiguredConnector(name, klass, section)
 
@@ -60,20 +62,22 @@ def parse_workflows(config):
     for workflow_name in workflow_names:
 
         # parse the source
-        source_section = f'workflow.{workflow_name}.source'
+        source_section = 'workflow.{}.source'.format(workflow_name)
         if source_section not in config.sections():
-            raise ConfigurationError(f'Workflow {workflow_name} lacks source')
+            raise ConfigurationError(
+                'Workflow {} lacks source'.format(workflow_name))
         source = parse_connector(config[source_section], 'source')
 
         # parse targets
         target_sections = list(set([
             s for s in config.sections()
             if len(s.split('.')) == 4
-            and s.startswith(f'workflow.{workflow_name}.target.')
+            and s.startswith('workflow.{}.target.'.format(workflow_name))
             and s.split('.')[3]]))
 
         if not target_sections:
-            raise ConfigurationError(f'Workflow {workflow_name} lacks targets')
+            raise ConfigurationError(
+                'Workflow {} lacks targets'.format(workflow_name))
 
         targets = [parse_connector(config[section], section.split('.')[3])
                    for section in target_sections]

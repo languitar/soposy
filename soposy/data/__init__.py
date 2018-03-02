@@ -19,9 +19,9 @@ class Entry(object):
         self.coordinates = coordinates
 
     def __str__(self):
-        return f'Entry({self.uniqueId!r}, {self.title!r}, ' \
-               f'{self.link!r}, {self.created_at!r}, ' \
-               f'description={self.description!r}, ' \
-               f'tags={self.tags!r}, ' \
-               f'photo={self.photo!r}, ' \
-               f'coordinates={self.coordinates!r})'
+        return 'Entry({self.uniqueId!r}, {self.title!r}, ' \
+               '{self.link!r}, {self.created_at!r}, ' \
+               'description={self.description!r}, ' \
+               'tags={self.tags!r}, ' \
+               'photo={self.photo!r}, ' \
+               'coordinates={self.coordinates!r})'.format(self)
